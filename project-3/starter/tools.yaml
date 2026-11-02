@@ -1,0 +1,32 @@
+sources:
+  betty-db:
+    kind: mysql
+    host: ${MYSQL_HOST}
+    port: ${MYSQL_PORT:3306}
+    database: betty
+    user: ${MYSQL_USER}
+    password: ${MYSQL_PASSWORD}
+
+tools:
+  get-product-price:
+    kind: mysql-sql
+    source: betty-db
+    description: >
+      Looks up the price of a product sold by Betty's Bird Boutique by its name.
+      Matching is case-insensitive and matches partial names, so "seed" will
+      return every product with "seed" in its name. Returns the product name and
+      its price in US dollars. Returns no rows if the store does not carry the item.
+    parameters:
+      - name: product_name
+        type: string
+        description: The name (or part of the name) of the product to look up, e.g. "Bird Seed Mix".
+    statement: |
+      SELECT product_name, price
+      FROM products
+      WHERE LOWER(product_name) LIKE CONCAT('%', LOWER(?), '%')
+      ORDER BY product_name
+      LIMIT 10;
+
+toolsets:
+  betty-tools:
+    - get-product-price
