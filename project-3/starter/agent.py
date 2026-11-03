@@ -43,8 +43,8 @@ tools = [
 toolbox_url = os.environ.get("TOOLBOX_URL", "http://127.0.0.1:5000")
 try:
     db_client = ToolboxSyncClient(toolbox_url)
-    tools.append(db_client.load_tool("get-product-price"))
-    print(f"Loaded get-product-price from Toolbox at {toolbox_url}")
+    tools.append(db_client.load_tool("get_product_price"))
+    print(f"Loaded get_product_price from Toolbox at {toolbox_url}")
 except Exception as e:  # noqa: BLE001
     # Keep the agent usable (document + web search) even if the Toolbox server
     # is not running, but make the problem obvious in the console.

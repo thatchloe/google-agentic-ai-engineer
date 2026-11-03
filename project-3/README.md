@@ -48,7 +48,7 @@ The root agent (`starter/agent.py`) uses three tools, each built a different way
 
 | Tool | Built with | Source of truth |
 |------|-----------|-----------------|
-| `get-product-price` | MCP Toolbox (`starter/tools.yaml`) | `betty.products` table in MySQL |
+| `get_product_price` | MCP Toolbox (`starter/tools.yaml`) | `betty.products` table in MySQL |
 | `datastore_search_tool` | Vertex AI Search via `google-cloud-discoveryengine` (`starter/datastore.py`) | PDFs in `starter/docs/` indexed in a Vertex AI Search datastore |
 | `search_agent` | `AgentTool` wrapping a Gemini agent with Grounding with Google Search (`starter/search_agent.py`) | The web |
 | `get_current_date` | Plain Python function tool (`starter/date_tool.py`) | The system clock, so "Are you open today?" works |
@@ -112,6 +112,13 @@ All commands are run from this `project/` directory.
    # Where the MCP Toolbox server listens
    TOOLBOX_URL=http://127.0.0.1:5001
 
+   # Model overrides (optional). The search agent defaults to gemini-2.5-flash and
+   # the root agent to gemini-3.5-flash. The Udacity lab project used for the
+   # screenshots returns 404 for the whole gemini-2.0/2.5 family, so there the
+   # search agent is pointed at the Flash tier that is served:
+   # SEARCH_AGENT_MODEL=gemini-3.5-flash
+   # ROOT_AGENT_MODEL=gemini-3.5-flash
+
    # Only if you use a service account instead of application-default credentials
    # GOOGLE_APPLICATION_CREDENTIALS=/absolute/path/to/key.json
    ```
@@ -167,7 +174,7 @@ Each tool can also be exercised on its own.
 * **Toolbox / database tool** - confirms `tools.yaml`, the MySQL user and the data are correct:
 
   ```bash
-  .venv/bin/python -c "from toolbox_core import ToolboxSyncClient; c = ToolboxSyncClient('http://127.0.0.1:5001'); print(c.load_tool('get-product-price')(product_name='seed'))"
+  .venv/bin/python -c "from toolbox_core import ToolboxSyncClient; c = ToolboxSyncClient('http://127.0.0.1:5001'); print(c.load_tool('get_product_price')(product_name='seed'))"
   ```
 
   Expected output lists `Bird Seed Mix` and `Sunflower Seeds` with their prices.
@@ -192,46 +199,64 @@ Each tool can also be exercised on its own.
 
   The **Events** tab in `adk web` shows which tool was called for each turn, which is useful
   when comparing models. Models are swapped with the `ROOT_AGENT_MODEL` and
-  `SEARCH_AGENT_MODEL` environment variables. The project guide suggests comparing
-  `gemini-2.5-pro`, `gemini-2.5-flash` and `gemini-2.5-flash-lite`; the lab project used for
-  this submission had no access to the 2.5 family, so the equivalent current tiers were
-  compared instead (`gemini-3.1-pro-preview`, `gemini-3.5-flash`, `gemini-3.5-flash-lite`).
-  `gemini-3.5-flash` is the default: the lite model is faster but occasionally skips a tool
-  call, and the pro model is noticeably slower with no better answers on these questions.
+  `SEARCH_AGENT_MODEL` environment variables.
+
+  **Search agent model.** `starter/search_agent.py` defaults to `gemini-2.5-flash` (Gemini 2.5
+  family) and the comment above the model line explains why: the search agent runs inside a
+  root-agent turn, so latency matters more than reasoning depth; it only has to run one grounded
+  search and write a short cited summary; and it is called for every general bird question, so
+  the cheaper Flash tier matters. The project guide suggests comparing `gemini-2.5-pro`,
+  `gemini-2.5-flash` and `gemini-2.5-flash-lite`. The lab project used for this submission has
+  no access to the 2.5 family (404 from Vertex AI), so the equivalent current tiers were
+  compared instead (`gemini-3.1-pro-preview`, `gemini-3.5-flash`, `gemini-3.5-flash-lite`) on the
+  conversation above: the lite model is faster but occasionally skips the search, and the pro
+  model is about 3x slower with no better answers. Flash is the best balance, which is why the
+  default is 2.5 Flash and the lab `.env` sets `SEARCH_AGENT_MODEL=gemini-3.5-flash`.
 
 ## Project Instructions
 
-### Screenshots to capture for the submission
+### Screenshots
 
-Take them in `adk web` with the **Events** panel open, and make sure the **session ID**
-(shown at the top of the chat) is visible in every screenshot.
+All screenshots are in [`screenshots/`](screenshots/) and come from **one `adk web` session,
+`7e064897-8557-44d4-a3f3-098476ec61ef`**, recorded on 2026-11-03 with the Events panel open.
+The session was renamed to its own ID so the ID is visible in the top bar of every screenshot,
+and the session drawer (which also lists the ID) is open in the conversation shots. Files are
+numbered in conversation order; `-conversation` shows the user request and agent reply,
+`-request` shows the selected tool-call event (function name and arguments) and `-response`
+shows the function response returned by the tool.
 
-1. The five-question conversation above, showing both prompts and full responses.
-2. For each of the three tools, click the tool-call event in the Events panel and capture the
-   **request** (function call arguments) and the **response** (function result). For the
-   datastore tool the response is the raw passage from the PDF, which is what the rubric
-   wants to see. For the web search tool the response includes the sources line.
-3. A database "not found" case, for example *Do you sell hamster wheels?* or
-   *How much is a parrot swing?*, showing the empty result and the agent's reply.
-4. An off-topic question, for example *Help me with my calculus homework*, to show the
-   guardrail declining.
-5. Optional: *Are you open today?* to show the date tool working with the store hours.
+| Turn | User request | Tool(s) | Files |
+|------|--------------|---------|-------|
+| 1 | What are the store's working hours? | `datastore_search_tool` | `01-datastore-store-hours-*` (response is the raw `bettys-hours` passage) |
+| 2 | Who is Betty? | `datastore_search_tool` | `02-datastore-who-is-betty-*` (response is the raw `bettys-history` passage) |
+| 3 | What kind of bird did she own? | none (answered from turn 2's context) | `03-datastore-bettys-bird-conversation` |
+| 4 | What do they eat? | `search_agent` (Grounding with Google Search) | `04-websearch-what-they-eat-*`; `-response-2-sources` shows the Sources list at the end of the grounded result |
+| 5 | Can I buy that from you? | `get_product_price` x4 (MySQL via MCP Toolbox) | `05-database-can-i-buy-*`; prices quoted, no order taken |
+| 6 | How much is a Bird Bath? | `get_product_price` | `06-database-bird-bath-price-*`; request `"Bird Bath"`, response `{"product_name":"Bird Bath","price":"75.99"}` |
+| 7 | Do you sell hamster wheels? | `get_product_price` | `07-database-not-found-*`; response `null`, agent says the item is not carried |
+| 8 | What are the latest news or trends in pet bird keeping this year? | `get_current_date`, `search_agent` | `08-websearch-current-info-*`; current-information query with Sources |
+| 9 | Help me with my calculus homework | none (guardrail) | `09-guardrail-off-topic-conversation` |
+| all | whole conversation, scrolled top to bottom | | `10-full-conversation-1` to `-5` |
+
+To reproduce: start the Toolbox and `adk web` as described above, open a **New Session**, ask
+the questions in the table in order, then click each tool-call chip in the chat to show its
+request or response in the left panel.
 
 ### Deliverables
 
 
 1. `starter/agent.py` with the in-memory session service, the three tools, and the root agent.
 2. `starter/agent-prompt.txt` with the on-topic guardrail and the "no orders" rule.
-3. `starter/tools.yaml` defining the `get-product-price` tool for the MCP Toolbox.
+3. `starter/tools.yaml` defining the `get_product_price` tool for the MCP Toolbox.
 4. `starter/datastore.py` implementing `search()` and `datastore_search_tool()`.
 5. `starter/search_agent.py` and `starter/search-prompt.txt` implementing the grounded search `AgentTool`.
 6. `starter/date_tool.py`, the date-awareness tool from the "stand out" suggestions.
-7. Screenshots as listed above.
+7. `screenshots/` with the conversation and tool-call evidence listed above.
 
 ## Built With
 
 * [Google Agent Development Kit](https://google.github.io/adk-docs/) - Agent framework, `adk web` previewer, `AgentTool`, `google_search`
-* [Vertex AI (Gemini)](https://cloud.google.com/vertex-ai) - `gemini-3.5-flash` for the root and search agents
+* [Vertex AI (Gemini)](https://cloud.google.com/vertex-ai) - `gemini-2.5-flash` for the search agent (`gemini-3.5-flash` in the lab project), `gemini-3.5-flash` for the root agent
 * [Vertex AI Search / Discovery Engine](https://cloud.google.com/generative-ai-app-builder/docs) - Document retrieval over the store PDFs
 * [MCP Toolbox for Databases](https://github.com/googleapis/mcp-toolbox) - Exposes the MySQL price query as a tool
 * [Cloud SQL for MySQL](https://cloud.google.com/sql/mysql) - Product price database

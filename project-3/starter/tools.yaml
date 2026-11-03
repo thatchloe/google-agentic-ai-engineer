@@ -8,7 +8,7 @@ sources:
     password: ${MYSQL_PASSWORD}
 
 tools:
-  get-product-price:
+  get_product_price:
     kind: mysql-sql
     source: betty-db
     description: >
@@ -29,4 +29,4 @@ tools:
 
 toolsets:
   betty-tools:
-    - get-product-price
+    - get_product_price
