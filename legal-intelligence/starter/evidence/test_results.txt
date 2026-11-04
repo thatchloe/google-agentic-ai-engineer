@@ -1,0 +1,95 @@
+test_initialization_failure_handling (__main__.TestTODO1_VertexAIInitialization.test_initialization_failure_handling)
+Test that initialization handles failures gracefully. ... Failed to initialize Vertex AI: Connection refused
+ok
+test_vertex_ai_initialization (__main__.TestTODO1_VertexAIInitialization.test_vertex_ai_initialization)
+Test that Vertex AI is properly initialized. ... ok
+test_content_generation_with_retry (__main__.TestTODO2_ContentGeneration.test_content_generation_with_retry)
+Test content generation with retry logic. ... Generation attempt 1/3 failed for liability_assessment: Network error
+ok
+test_content_generation_without_initialization (__main__.TestTODO2_ContentGeneration.test_content_generation_without_initialization)
+Test that content generation fails without initialization. ... ok
+test_all_sections_failing_raises (__main__.TestTODO3_CompleteReport.test_all_sections_failing_raises)
+Test that a report with no content is reported as an error. ... Generation failed for liability_assessment: API down
+Generation failed for damage_calculation: API down
+Generation failed for prior_art_analysis: API down
+Generation failed for competitive_landscape: API down
+Generation failed for risk_assessment: API down
+Generation failed for strategic_recommendations: API down
+ok
+test_complete_report_generation (__main__.TestTODO3_CompleteReport.test_complete_report_generation)
+Test complete report generation with all sections. ... ok
+test_context_passes_between_sections (__main__.TestTODO3_CompleteReport.test_context_passes_between_sections)
+Each section receives every earlier section as context. ... ok
+test_cost_uses_model_pricing (__main__.TestTODO3_CompleteReport.test_cost_uses_model_pricing)
+Test that cost follows the configured model's rates. ... ok
+test_failed_section_degrades_gracefully (__main__.TestTODO3_CompleteReport.test_failed_section_degrades_gracefully)
+Test that one failed section does not lose the rest of the report. ... Generation failed for damage_calculation: API down
+ok
+test_low_quality_section_is_retried (__main__.TestTODO3_CompleteReport.test_low_quality_section_is_retried)
+Test that a substandard section is regenerated with feedback. ... liability_assessment scored 0.40, below 0.7; retrying
+ok
+test_prompt_includes_previous_section_content (__main__.TestTODO3_CompleteReport.test_prompt_includes_previous_section_content)
+Earlier findings reach the model through the prompt. ... ok
+test_report_records_audit_trail (__main__.TestTODO3_CompleteReport.test_report_records_audit_trail)
+Metadata traces each section of a run for operators. ... ok
+test_coherence_high_quality_content (__main__.TestTODO4_CoherenceScoring.test_coherence_high_quality_content)
+Test coherence scoring on high-quality content. ... ok
+test_coherence_low_quality_content (__main__.TestTODO4_CoherenceScoring.test_coherence_low_quality_content)
+Test coherence scoring on low-quality content. ... ok
+test_coherence_scoring_components (__main__.TestTODO4_CoherenceScoring.test_coherence_scoring_components)
+Test individual components of coherence scoring. ... ok
+test_groundedness_damage_section (__main__.TestTODO5_GroundednessScoring.test_groundedness_damage_section)
+Test groundedness scoring for damage calculation. ... ok
+test_groundedness_liability_section (__main__.TestTODO5_GroundednessScoring.test_groundedness_liability_section)
+Test groundedness scoring for liability assessment. ... ok
+test_groundedness_missing_elements (__main__.TestTODO5_GroundednessScoring.test_groundedness_missing_elements)
+Test groundedness with missing expected elements. ... ok
+test_groundedness_reasoning_indicators (__main__.TestTODO5_GroundednessScoring.test_groundedness_reasoning_indicators)
+Test that reasoning indicators contribute to score. ... ok
+test_scores_rank_high_above_medium_above_low (__main__.TestQualityRanking.test_scores_rank_high_above_medium_above_low)
+Test the ranking on the coherence, groundedness, and overall scores. ... ok
+test_business_analyst_persona_exists (__main__.TestTODO6_BusinessAnalystPersona.test_business_analyst_persona_exists)
+Test that business analyst persona is defined. ... ok
+test_business_analyst_persona_quality (__main__.TestTODO6_BusinessAnalystPersona.test_business_analyst_persona_quality)
+Test business analyst persona meets quality criteria. ... ok
+test_business_analyst_specific_content (__main__.TestTODO6_BusinessAnalystPersona.test_business_analyst_specific_content)
+Test business analyst has specific required content. ... ok
+test_personas_include_bias_rules (__main__.TestPersonaVariables.test_personas_include_bias_rules)
+Test that every persona carries the bias mitigation rules. ... ok
+test_personas_use_designated_variables (__main__.TestPersonaVariables.test_personas_use_designated_variables)
+Test that each agent type returns its persona variable. ... ok
+test_market_researcher_persona_exists (__main__.TestTODO7_MarketResearcherPersona.test_market_researcher_persona_exists)
+Test that market researcher persona is defined. ... ok
+test_market_researcher_persona_quality (__main__.TestTODO7_MarketResearcherPersona.test_market_researcher_persona_quality)
+Test market researcher persona meets quality criteria. ... ok
+test_market_researcher_specific_content (__main__.TestTODO7_MarketResearcherPersona.test_market_researcher_specific_content)
+Test market researcher has specific required content. ... ok
+test_strategic_consultant_persona_exists (__main__.TestTODO8_StrategicConsultantPersona.test_strategic_consultant_persona_exists)
+Test that strategic consultant persona is defined. ... ok
+test_strategic_consultant_persona_quality (__main__.TestTODO8_StrategicConsultantPersona.test_strategic_consultant_persona_quality)
+Test strategic consultant persona meets quality criteria. ... ok
+test_strategic_consultant_specific_content (__main__.TestTODO8_StrategicConsultantPersona.test_strategic_consultant_specific_content)
+Test strategic consultant has specific required content. ... ok
+
+----------------------------------------------------------------------
+Ran 31 tests in 0.035s
+
+OK
+
+============================================================
+TEST SUMMARY
+============================================================
+Tests run: 31
+Failures: 0
+Errors: 0
+
+TODO 1: Vertex AI Initialization ............ ✓ PASSED
+TODO 2: Generate Section Content ............ ✓ PASSED
+TODO 3: Generate Complete Report ............ ✓ PASSED
+TODO 4: Coherence Scoring ................... ✓ PASSED
+TODO 5: Groundedness Scoring ................ ✓ PASSED
+TODO 6: IP Litigation Expert Persona ........ ✓ PASSED
+TODO 7: IP Valuation Specialist Persona ..... ✓ PASSED
+TODO 8: Patent Researcher Persona ........... ✓ PASSED
+
+ALL TODOS COMPLETED! ✅

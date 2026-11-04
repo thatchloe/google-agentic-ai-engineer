@@ -1,0 +1,40 @@
+INFO:     Started server process [26762]
+INFO:     Waiting for application startup.
+2026-11-04 17:36:26 - legal-intelligence - INFO - run=- - Starting Legal Intelligence AI System...
+2026-11-04 17:36:26 - legal-intelligence - INFO - run=- - Loading agent personas...
+2026-11-04 17:36:26 - src.prompts.personas - INFO - run=- - Loaded 3 legal personas
+2026-11-04 17:36:26 - legal-intelligence - INFO - run=- - Initializing quality validator...
+2026-11-04 17:36:26 - legal-intelligence - INFO - run=- - Initializing Legal Intelligence Agent...
+2026-11-04 17:36:26 - src.prompts.personas - INFO - run=- - Loaded 3 legal personas
+2026-11-04 17:36:26 - src.core.agent_system - INFO - run=- - LegalIntelligenceAgent initialized for project lab18131094-1793758178
+2026-11-04 17:36:26 - src.core.agent_system - INFO - run=- - Initializing Vertex AI for project: lab18131094-1793758178
+2026-11-04 17:36:27 - src.core.agent_system - INFO - run=- - Vertex AI initialized with model gemini-3.5-flash
+2026-11-04 17:36:27 - legal-intelligence - INFO - run=- - ✅ System initialized successfully
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://127.0.0.1:8010 (Press CTRL+C to quit)
+INFO:     127.0.0.1:62903 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62905 - "GET /health HTTP/1.1" 200 OK
+2026-11-04 17:36:28 - legal-intelligence - INFO - run=- - Starting analysis for case: Ad Hoc IP Analysis
+2026-11-04 17:36:28 - src.core.agent_system - INFO - run=1b361ee1 - Starting complete report generation for case: Ad Hoc IP Analysis
+2026-11-04 17:36:47 - src.core.agent_system - INFO - run=1b361ee1 - Generated liability_assessment: 5850 tokens, $0.0479
+2026-11-04 17:36:47 - src.core.agent_system - INFO - run=1b361ee1 - Section complete: type=liability_assessment agent=business_analyst quality=0.91 tokens=5850 cost=$0.0479
+2026-11-04 17:37:05 - src.core.agent_system - INFO - run=1b361ee1 - Generated damage_calculation: 5076 tokens, $0.0400
+2026-11-04 17:37:05 - src.core.agent_system - INFO - run=1b361ee1 - Section complete: type=damage_calculation agent=business_analyst quality=0.96 tokens=5076 cost=$0.0400
+2026-11-04 17:37:23 - src.core.agent_system - INFO - run=1b361ee1 - Generated prior_art_analysis: 4922 tokens, $0.0373
+2026-11-04 17:37:23 - src.core.agent_system - INFO - run=1b361ee1 - Section complete: type=prior_art_analysis agent=market_researcher quality=0.95 tokens=4922 cost=$0.0373
+2026-11-04 17:37:45 - src.core.agent_system - INFO - run=1b361ee1 - Generated competitive_landscape: 6179 tokens, $0.0487
+2026-11-04 17:37:45 - src.core.agent_system - INFO - run=1b361ee1 - Section complete: type=competitive_landscape agent=market_researcher quality=0.98 tokens=6179 cost=$0.0487
+2026-11-04 17:38:05 - src.core.agent_system - INFO - run=1b361ee1 - Generated risk_assessment: 5871 tokens, $0.0462
+2026-11-04 17:38:05 - src.core.agent_system - INFO - run=1b361ee1 - Section complete: type=risk_assessment agent=strategic_consultant quality=0.89 tokens=5871 cost=$0.0462
+2026-11-04 17:38:21 - src.core.agent_system - INFO - run=1b361ee1 - Generated strategic_recommendations: 4660 tokens, $0.0353
+2026-11-04 17:38:21 - src.core.agent_system - INFO - run=1b361ee1 - Section complete: type=strategic_recommendations agent=strategic_consultant quality=0.94 tokens=4660 cost=$0.0353
+2026-11-04 17:38:21 - src.core.agent_system - INFO - run=1b361ee1 - Report complete: case=Ad Hoc IP Analysis sections=6 failed=0 tokens=32558 cost=$0.2553 time=113.1s
+2026-11-04 17:38:21 - legal-intelligence - INFO - run=1b361ee1 - Analysis completed in 113.14s
+INFO:     127.0.0.1:62907 - "POST /analyze HTTP/1.1" 200 OK
+2026-11-04 17:38:21 - legal-intelligence - INFO - run=1b361ee1 - Running background quality check for Ad Hoc IP Analysis
+2026-11-04 17:38:21 - legal-intelligence - INFO - run=1b361ee1 - Quality check passed for Ad Hoc IP Analysis: Score 0.90
+INFO:     127.0.0.1:62916 - "GET /metrics HTTP/1.1" 200 OK
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [26762]

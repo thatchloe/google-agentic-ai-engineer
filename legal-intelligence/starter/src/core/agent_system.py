@@ -10,6 +10,7 @@ import os
 import time
 import json
 import logging
+import uuid
 from typing import Dict, List, Optional, Any, Tuple
 from dataclasses import dataclass, field
 from datetime import datetime
@@ -28,6 +29,7 @@ from ..models.legal_models import (
     TokenUsage
 )
 from ..prompts.personas import LegalPersonas
+from ..utils.logger import run_id_var
 from .quality_validator import QualityValidator
 
 logger = logging.getLogger(__name__)
@@ -218,6 +220,8 @@ class LegalIntelligenceAgent:
         Raises:
             RuntimeError: If no section could be generated
         """
+        run_id = uuid.uuid4().hex[:8]
+        run_id_var.set(run_id)
         logger.info(f"Starting complete report generation for case: {scenario.case_name}")
         start_time = time.time()
 
@@ -237,6 +241,7 @@ class LegalIntelligenceAgent:
         total_tokens = 0
         quality_retries = 0
         failed_sections: List[str] = []
+        audit_trail: List[Dict[str, Any]] = []
 
         for section_type, persona_type in section_config:
             persona = self.personas.get_persona(persona_type)
@@ -245,6 +250,8 @@ class LegalIntelligenceAgent:
             section_tokens = 0
             section_cost = 0.0
             attempt_persona = persona
+            generations = 0
+            section_start = time.time()
 
             # Quality loop: regenerate with the validator's feedback until the
             # section passes, then keep the best-scoring attempt.
@@ -262,6 +269,7 @@ class LegalIntelligenceAgent:
                     logger.error(f"Generation failed for {section_type}: {str(e)}")
                     break
 
+                generations += 1
                 section_tokens += token_usage.total_tokens
                 section_cost += cost
 
@@ -309,6 +317,20 @@ class LegalIntelligenceAgent:
             ))
             total_tokens += section_tokens
             total_cost += section_cost
+            audit_trail.append({
+                "section": section_type,
+                "agent": persona_type,
+                "status": "failed" if section_type in failed_sections else "complete",
+                "generations": generations,
+                "quality_score": round(best_score, 3),
+                "passed_threshold": best_score >= quality_threshold,
+                "tokens": section_tokens,
+                "cost_usd": round(section_cost, 6),
+                "duration_seconds": round(time.time() - section_start, 2),
+                "context_sections": [
+                    s.type for s in sections[:-1] if s.type not in failed_sections
+                ][-2:],
+            })
 
         if len(failed_sections) == len(section_config):
             raise RuntimeError("Report generation failed: no section could be generated")
@@ -331,6 +353,7 @@ class LegalIntelligenceAgent:
             confidence_score=sum(s.quality_score for s in sections) / len(sections),
             timestamp=datetime.now().isoformat(),
             metadata={
+                "run_id": run_id,
                 "model": self.model_name,
                 "status": "partial" if failed_sections else "complete",
                 "failed_sections": failed_sections,
@@ -342,7 +365,8 @@ class LegalIntelligenceAgent:
                 "quality_retries": quality_retries,
                 "sections_below_threshold": [
                     s.type for s in sections if s.quality_score < quality_threshold
-                ]
+                ],
+                "audit_trail": audit_trail
             }
         )
 

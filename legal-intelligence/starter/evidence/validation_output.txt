@@ -1,0 +1,13 @@
+Persona validation (minimum 0.8)
+  BUSINESS_ANALYST_PERSONA       score=1.00  words=303
+  MARKET_RESEARCHER_PERSONA      score=1.00  words=327
+  STRATEGIC_CONSULTANT_PERSONA   score=1.00  words=313
+
+Quality ranking (threshold 0.7)
+  sample    coherence  groundedness  overall  gate
+  high          1.000         0.925    0.853  pass
+  medium        0.367         0.315    0.317  retry
+  low           0.112         0.000    0.051  retry
+
+Personas: PASSED
+Ranking high > medium > low: PASSED

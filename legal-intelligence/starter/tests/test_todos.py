@@ -30,7 +30,7 @@ from src.prompts.personas import (
     MARKET_RESEARCHER_PERSONA,
     STRATEGIC_CONSULTANT_PERSONA
 )
-from src.models.legal_models import LegalScenario, TokenUsage
+from src.models.legal_models import LegalScenario, ReportSection, TokenUsage
 
 
 class TestTODO1_VertexAIInitialization(unittest.TestCase):
@@ -235,6 +235,58 @@ class TestTODO3_CompleteReport(unittest.IsolatedAsyncioTestCase):
         self.assertGreater(report.total_cost, 0)
         self.assertGreater(report.confidence_score, 0)
 
+
+    @patch.object(LegalIntelligenceAgent, 'generate_section_content')
+    @patch.object(QualityValidator, 'validate_section')
+    async def test_context_passes_between_sections(self, mock_validate, mock_generate):
+        """Each section receives every earlier section as context."""
+        usage = TokenUsage(input_tokens=100, output_tokens=50, total_tokens=150)
+        mock_generate.side_effect = [
+            (f"Content {i}", usage, 0.01) for i in range(6)
+        ]
+        mock_validate.return_value = Mock(overall_score=0.8)
+
+        await self.agent.generate_complete_report(self._scenario())
+
+        for i, call in enumerate(mock_generate.call_args_list):
+            previous = call.args[3]
+            self.assertEqual([s.content for s in previous],
+                             [f"Content {n}" for n in range(i)])
+
+    def test_prompt_includes_previous_section_content(self):
+        """Earlier findings reach the model through the prompt."""
+        previous = ReportSection(
+            type="liability_assessment", title="Liability Assessment",
+            content="Liability probability is 30% on the 2015 prior art.",
+            agent_type="business_analyst", quality_score=0.9, tokens_used=10,
+            cost=0.01, timestamp="2026-11-04T00:00:00"
+        )
+        prompt = self.agent._build_prompt(
+            "Persona", "damage_calculation", self._scenario(), [previous]
+        )
+        self.assertIn("PREVIOUS ANALYSIS", prompt)
+        self.assertIn("Liability probability is 30%", prompt)
+
+    @patch.object(LegalIntelligenceAgent, 'generate_section_content')
+    @patch.object(QualityValidator, 'validate_section')
+    async def test_report_records_audit_trail(self, mock_validate, mock_generate):
+        """Metadata traces each section of a run for operators."""
+        mock_generate.return_value = (
+            "Content", TokenUsage(input_tokens=100, output_tokens=50, total_tokens=150), 0.01
+        )
+        mock_validate.return_value = Mock(overall_score=0.8)
+
+        report = await self.agent.generate_complete_report(self._scenario())
+
+        self.assertTrue(report.metadata["run_id"])
+        trail = report.metadata["audit_trail"]
+        self.assertEqual(len(trail), 6)
+        self.assertEqual(trail[0]["context_sections"], [])
+        self.assertEqual(trail[2]["context_sections"],
+                         ["liability_assessment", "damage_calculation"])
+        self.assertEqual(trail[0]["generations"], 1)
+        self.assertEqual(trail[0]["tokens"], 150)
+        self.assertTrue(trail[0]["passed_threshold"])
 
     def _scenario(self):
         return LegalScenario(

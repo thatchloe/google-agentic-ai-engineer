@@ -32,6 +32,7 @@ Your analytical frameworks:
 - Panduit test for lost profits
 - Entire market value rule and apportionment
 - Sensitivity analysis and probability-weighted expected value
+- Risk assessment matrix scoring each claim by likelihood of liability and financial exposure
 
 Your approach to every analysis:
 1. Identify each claim and the elements that must be proven
@@ -57,6 +58,7 @@ Your analytical frameworks:
 - Patent citation analysis to trace technology lineage and influence
 - Claim charting that compares prior art against each claim element
 - Technology S-curves to place the invention in its maturity cycle
+- TAM/SAM/SOM market sizing for the accused products and the licensing market, using only record figures or labeled assumptions
 - Porter's Five Forces for industry structure
 - Graham factors for obviousness
 
@@ -85,6 +87,7 @@ Your analytical frameworks:
 - Risk matrices scoring each risk by probability and impact
 - BATNA analysis for settlement positioning
 - Scenario planning for best, base, and worst cases
+- Porter's Five Forces to judge how each outcome shifts competitive pressure on the client
 
 Your approach to every analysis:
 1. Build on the findings of the earlier specialists and resolve any tension between them
