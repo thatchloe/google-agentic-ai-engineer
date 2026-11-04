@@ -710,8 +710,26 @@ def run_tests():
     print(f"Failures: {len(result.failures)}")
     print(f"Errors: {len(result.errors)}")
 
+    # Print per-TODO status (shared test classes count toward each TODO they cover)
+    todo_checks = [
+        ("TODO 1: Vertex AI Initialization", [TestTODO1_VertexAIInitialization]),
+        ("TODO 2: Generate Section Content", [TestTODO2_ContentGeneration]),
+        ("TODO 3: Generate Complete Report", [TestTODO3_CompleteReport]),
+        ("TODO 4: Coherence Scoring", [TestTODO4_CoherenceScoring, TestQualityRanking]),
+        ("TODO 5: Groundedness Scoring", [TestTODO5_GroundednessScoring, TestQualityRanking]),
+        ("TODO 6: IP Litigation Expert Persona", [TestTODO6_BusinessAnalystPersona, TestPersonaVariables]),
+        ("TODO 7: IP Valuation Specialist Persona", [TestTODO7_MarketResearcherPersona, TestPersonaVariables]),
+        ("TODO 8: Patent Researcher Persona", [TestTODO8_StrategicConsultantPersona, TestPersonaVariables]),
+    ]
+    failed_classes = {type(test) for test, _ in result.failures + result.errors}
+
+    print()
+    for label, classes in todo_checks:
+        status = "✗ FAILED" if failed_classes.intersection(classes) else "✓ PASSED"
+        print(f"{label} {'.' * (44 - len(label))} {status}")
+
     if result.wasSuccessful():
-        print("\n✅ ALL TESTS PASSED! Your implementation is correct!")
+        print("\nALL TODOS COMPLETED! ✅")
     else:
         print("\n❌ SOME TESTS FAILED. Review the errors above.")
 
